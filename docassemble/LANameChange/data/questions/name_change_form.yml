@@ -70,7 +70,7 @@ code: |
   Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
   could_efile
   basic_questions_signature_flow
-  if could_efile:
+  if will_efile and could_efile:
     efile
   Name_Change_Form_1_1_1_download
 ---
