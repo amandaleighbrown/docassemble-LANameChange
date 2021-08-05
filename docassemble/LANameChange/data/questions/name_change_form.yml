@@ -40,6 +40,7 @@ code: |
 ---
 code: |
   al_form_type = 'starts_case'
+  efile_author_mode = False
 ---
 features:
   navigation: True
@@ -71,6 +72,7 @@ code: |
   could_efile
   basic_questions_signature_flow
   if will_efile:
+    users[0].email
     could_efile
   Name_Change_Form_1_1_1_download
 ---
