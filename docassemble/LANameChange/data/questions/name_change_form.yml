@@ -70,8 +70,8 @@ code: |
   Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
   could_efile
   basic_questions_signature_flow
-  if will_efile and could_efile:
-    efile
+  if will_efile:
+    could_efile
   Name_Change_Form_1_1_1_download
 ---
 #################### Interview order #####################
@@ -199,6 +199,8 @@ subquestion: |
   ${ al_user_bundle.download_list_html() }
   
   ${ al_user_bundle.send_button_html() }
+
+  ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file') }
 
 ---
 id: trial court county
