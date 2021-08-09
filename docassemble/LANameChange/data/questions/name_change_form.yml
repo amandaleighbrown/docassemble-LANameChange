@@ -199,7 +199,7 @@ subquestion: |
   ${ action_button_html(url_action('review_Name_Change_Form_1_1_1'), label='Make changes', color='info') } 
 
   % if ready_to_efile and not (defined('efile') and efile):
-  Click to "E-File" button below to e-file your form at ${ trial_court }.
+  Click the "E-File" button below to e-file your form at ${ trial_court }.
 
   ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file') }
   % endif
