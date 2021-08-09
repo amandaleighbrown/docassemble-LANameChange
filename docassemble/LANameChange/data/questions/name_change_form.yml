@@ -64,16 +64,16 @@ code: |
   Name_Change_Form_1_1_1_intro
   # Interview order block has form-specific logic controlling order/branching
   trial_court
+  can_check_efile
   interview_order_Name_Change_Form_1_1_1
   signature_date
   # Save (anonymized) interview statistics.
   store_variables_snapshot(data={'zip': users[0].address.zip})
-  Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
-  could_efile
-  basic_questions_signature_flow
-  if will_efile:
+  if can_check_efile:
     users[0].email
-    could_efile
+    ready_to_efile
+  Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
+  basic_questions_signature_flow
   Name_Change_Form_1_1_1_download
 ---
 #################### Interview order #####################
@@ -180,7 +180,7 @@ help: |
 ---
 sets: users[0].address.county
 code: |
-  user[0].address.geocode()
+  users[0].address.geocode()
 ---
 code: |
   address.reset_geocoding()
@@ -195,14 +195,18 @@ subquestion: |
   Thank you. Your form is ready to download and deliver.
   
   View and download your form below. Click the "Make changes" button to fix any mistakes.
-  
+
   ${ action_button_html(url_action('review_Name_Change_Form_1_1_1'), label='Make changes', color='info') } 
+
+  % if ready_to_efile and not (defined('efile') and efile):
+  Click to "E-File" button below to e-file your form at ${ trial_court }.
+
+  ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file') }
+  % endif
 
   ${ al_user_bundle.download_list_html() }
   
   ${ al_user_bundle.send_button_html() }
-
-  ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file') }
 
 ---
 id: trial court county
