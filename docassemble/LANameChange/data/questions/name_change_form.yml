@@ -1,6 +1,7 @@
 include:
   - docassemble.AssemblyLine:al_package.yml
-  - custom_organization.yml
+  - docassemble.ALGenericJurisdiction:custom_organization.yml
+  - docassemble.EFSPIntegration:efiling_integration.yml
 ---
 comment: |
   The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
@@ -39,6 +40,7 @@ code: |
 ---
 code: |
   al_form_type = 'starts_case'
+  efile_author_mode = False
 ---
 features:
   navigation: True
@@ -62,10 +64,14 @@ code: |
   Name_Change_Form_1_1_1_intro
   # Interview order block has form-specific logic controlling order/branching
   trial_court
+  can_check_efile
   interview_order_Name_Change_Form_1_1_1
   signature_date
   # Save (anonymized) interview statistics.
   store_variables_snapshot(data={'zip': users[0].address.zip})
+  if can_check_efile:
+    users[0].email
+    ready_to_efile
   Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
   basic_questions_signature_flow
   Name_Change_Form_1_1_1_download
@@ -174,7 +180,7 @@ help: |
 ---
 sets: users[0].address.county
 code: |
-  user[0].address.geocode()
+  users[0].address.geocode()
 ---
 code: |
   address.reset_geocoding()
@@ -188,14 +194,20 @@ question: |
 subquestion: |
   Thank you. Your form is ready to download and deliver.
   
-  View, download and send your form below. Click the "Make changes" button to fix any mistakes. 
-  
+  View and download your form below. Click the "Make changes" button to fix any mistakes.
+
   ${ action_button_html(url_action('review_Name_Change_Form_1_1_1'), label='Make changes', color='info') } 
-  
+
+  % if ready_to_efile and not (defined('efile') and efile):
+  Click the "E-File" button below to e-file your form at ${ trial_court }.
+
+  ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file') }
+  % endif
+
   ${ al_user_bundle.download_list_html() }
   
   ${ al_user_bundle.send_button_html() }
-  
+
 ---
 id: trial court county
 continue button field: case_county
@@ -214,8 +226,8 @@ objects:
   - Name_Change_Form_1_1_1_attachment: ALDocument.using(title="Louisiana Adult Name Change Form", filename="Name_Change_Form_1_1_1", enabled=True, has_addendum=False)
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[Name_Change_Form_1_1_1_attachment], filename="Name_Change_Form_1_1_1.pdf", title="All forms to download for your records")
-  - al_court_bundle: ALDocumentBundle.using(elements=[Name_Change_Form_1_1_1_attachment], filename="Name_Change_Form_1_1_1.pdf", title="All forms to download for your records")
+  - al_user_bundle: ALDocumentBundle.using(enabled=True, elements=[Name_Change_Form_1_1_1_attachment], filename="Name_Change_Form_1_1_1.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(enabled=True, elements=[Name_Change_Form_1_1_1_attachment], filename="Name_Change_Form_1_1_1.pdf", title="All forms to download for your records")
 ---
 attachment:
     variable name: Name_Change_Form_1_1_1_attachment[i]
@@ -255,6 +267,9 @@ event: review_Name_Change_Form_1_1_1
 question: |
   Review Screen
 subquestion: |
+  % if efile:
+  **WARNING**: your answers have already been efiled, and changing this will not change your submitted answers.
+  % endif
   Edit your answers below
 review: 
   - Edit: petitioner_birthdate
