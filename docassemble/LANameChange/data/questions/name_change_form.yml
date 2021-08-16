@@ -201,7 +201,7 @@ subquestion: |
   % if ready_to_efile and not (defined('efile') and efile):
   Click the "E-File" button below to e-file your form at ${ trial_court }.
 
-  ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file') }
+  ${ action_button_html(url_ask([{'recompute': ['efile']}]), label='E-file', icon='file-export') }
   % endif
 
   ${ al_user_bundle.download_list_html() }
@@ -258,6 +258,8 @@ attachment:
       - "judicial_district3": ${ trial_court.judicial_district }
       - "district_court1": ${ trial_court.judicial_district }
       - "petitioner_domicile": ${ users[0].address.county.replace(" Parish", "") }
+      - "district_attorney1": ${ trial_court.district_attorney }
+      - "district_attorney2": ${ trial_court.district_attorney }
 
       # It's a signature: test which file version this is; leave empty unless it's the final version)
       - "user_signature": ${ users[0].signature if i == 'final' else '' }
