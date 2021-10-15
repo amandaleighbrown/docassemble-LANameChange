@@ -41,6 +41,8 @@ code: |
 code: |
   al_form_type = 'starts_case'
   efile_author_mode = False
+  jurisdiction_id = 'louisiana'
+  proxy_conn = ProxyConnection(credentials_code_block=None)
 ---
 features:
   navigation: True
@@ -51,7 +53,9 @@ sections:
 objects:
   - users: ALPeopleList.using(ask_number=True,target_number=1)
   - court_list: ALCourtLoader.using(file_name='JDCs_by_Parish.csv')
-
+---
+code: |
+  lead_contact = users[0]
 ---
 ###################### Main order ######################
 mandatory: True
@@ -71,6 +75,7 @@ code: |
   store_variables_snapshot(data={'zip': users[0].address.zip})
   if can_check_efile:
     users[0].email
+    lead_contact
     ready_to_efile
   Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
   basic_questions_signature_flow
@@ -183,8 +188,8 @@ code: |
   users[0].address.geocode()
 ---
 code: |
-  address.reset_geocoding()
-  address.geocoding_reset = True
+  users[0].address.reset_geocoding()
+  users[0].address.geocoding_reset = True
 ---
 progress: 100
 id: download
