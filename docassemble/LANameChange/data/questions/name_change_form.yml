@@ -1,3 +1,4 @@
+#recent updates for commit: upadated template, reordered interview, fixed signature failure, general code cleaning
 include:
   - docassemble.AssemblyLine:al_package.yml
   - docassemble.ALLouisianaSC:custom_organization.yml
@@ -18,9 +19,9 @@ comment: |
 mandatory: True
 code: |
   interview_metadata # make sure we initialize the object
-  if not defined("interview_metadata['Name_Change_Form_1_1_1']"):
-    interview_metadata.initializeObject('Name_Change_Form_1_1_1')
-  interview_metadata['Name_Change_Form_1_1_1'].update({
+  if not defined("interview_metadata['Louisiana_Adult_Name_Change_Form']"):
+    interview_metadata.initializeObject('Louisiana_Adult_Name_Change_Form')
+  interview_metadata['Louisiana_Adult_Name_Change_Form'].update({
     'title': 'Louisiana Adult Name Change Form',
     'short title': 'Louisiana Adult Name Change Form',
     'description': 'Louisiana Adult Name Change Form',
@@ -30,8 +31,8 @@ code: |
     'categories': [
       'FA-00-00-00-00',
     ],
-    'logic block variable': 'Name_Change_Form_1_1_1',
-    'attachment block variable': 'Name_Change_Form_1_1_1_attachment',
+    'logic block variable': 'Louisiana_Adult_Name_Change_Form',
+    'attachment block variable': 'Louisiana_Adult_Name_Change_Form_attachment',
     'typical role': 'plaintiff',
   })
 ---
@@ -48,7 +49,7 @@ features:
   navigation: True
 ---
 sections:
-  - review_Name_Change_Form_1_1_1: Review your answers
+  - review_Louisiana_Adult_Name_Change_Form: Review your answers
 ---
 objects:
   - users: ALPeopleList.using(ask_number=True,target_number=1)
@@ -62,14 +63,14 @@ mandatory: True
 comment: |
   This block includes the logic for standalone interviews.
   Delete mandatory: True to include in another interview
-id: main_order_Name_Change_Form_1_1_1
+id: main_order_Louisiana_Adult_Name_Change_Form
 code: |
   al_intro_screen
-  Name_Change_Form_1_1_1_intro
+  Louisiana_Adult_Name_Change_Form_intro
   # Interview order block has form-specific logic controlling order/branching
   trial_court
   can_check_efile
-  interview_order_Name_Change_Form_1_1_1
+  interview_order_Louisiana_Adult_Name_Change_Form
   signature_date
   # Save (anonymized) interview statistics.
   store_variables_snapshot(data={'zip': users[0].address.zip})
@@ -77,39 +78,101 @@ code: |
     users[0].email
     lead_contact
     ready_to_efile
-  Name_Change_Form_1_1_1_preview_question  # Pre-canned preview screen
+  Louisiana_Adult_Name_Change_Form_preview_question  # Pre-canned preview screen
   basic_questions_signature_flow
-  Name_Change_Form_1_1_1_download
+  Louisiana_Adult_Name_Change_Form_download
 ---
 #################### Interview order #####################
 comment: |
   Controls order and branching logic of questions in the interview
-id: interview_order_Name_Change_Form_1_1_1
+id: interview_order_Louisiana_Adult_Name_Change_Form
 code: |
   # Set the allowed courts for this interview
-  allowed_courts = interview_metadata["Name_Change_Form_1_1_1"]["allowed courts"]
-  nav.set_section('review_Name_Change_Form_1_1_1')
+  allowed_courts = interview_metadata["Louisiana_Adult_Name_Change_Form"]["allowed courts"]
+  nav.set_section('review_Louisiana_Adult_Name_Change_Form')
   user_role = plaintiff
   users[0].name.first
-  petitioner_birthdate
   name_new
   set_progress(50.0)
   petitioners[0].address.address
   petitioners[0].phone_number
+  petitioner_birthdate
   trial_court_index
-  interview_order_Name_Change_Form_1_1_1 = True
+  interview_order_Louisiana_Adult_Name_Change_Form = True
+---
+id: basic questions intro screen
+decoration: form-lineal
+question: |
+  ${interview_short_title}: File Legal Forms Online
+subquestion: |
+  % if form_approved_for_email_filing:
+  This website can help you complete and file court forms in 3 steps:
+  % else:
+  This website can help you complete and download forms in 3 steps:
+  % endif
+  
+  Step 1. Answer questions that will fill in your form for you.  
+  Step 2. Preview the completed form.  
+  % if form_approved_for_email_filing:  
+  Step 3. Email the form to the court using this secure website and save copies
+  for yourself for later reference.  
+  % elif al_form_type in ['starts_case','existing_case','appeal']:
+  Step 3. Download and print the final form. You will need to deliver it
+  to the court on your own.
+  % else:
+  Step 3. Download and print the final form. You will need to deliver it 
+  on your own.
+  % endif
+  
+  This site is not a lawyer. If you would like a lawyer, you can find one through [the Louisiana State Bar Association](https://www.lsba.org/Public/LawyerReferral.aspx). Free legal service providers do not typically handle this type of case.
+  
+  Tap the {green words} on any screen for a definition or more information.
+  
+  % if chat_partners_available().help:
+  Live help is currently available in this interview. Click the speech bubble
+  (:comment-alt:) in the navigation bar to connect to a live advocate for help.
+  % endif
+fields:
+  # This points to a terms of use in this package which you can edit.
+  # If you prefer, you can link to a static website by deleting everything
+  # in the ${ } tags and replacing with a static website, like 
+  # https://example.com/tos
+  - To continue, you must accept our [terms of use](${interview_url(i=user_info().package + ':terms_of_use.yml')}){:target="_blank"}: acknowledged_information_use
+    datatype: checkboxes
+    none of the above: False    
+    minlength: 1
+    choices:
+      - I accept the terms of use.: I accept
+    validation messages:
+      minlength: |
+        You cannot continue unless you agree to the terms of use.        
+continue button field: al_intro_screen
+terms:
+  green words: |
+    Green words are legal terms or a short way of referring to something that needs more explanation. The definition or explanation pops up when you tap the green words.
+right: |
+  % if user_has_saved_answers:
+  ${fa_icon("bell", color="primary", size="sm")}
+  Saved answers available!  
+  
+  ${action_button_html(url_action('load_answer'), icon="folder-open", label=word("View answers"), size="sm" )}
+  % endif    
 ---
 comment: |
   This question is used to introduce your interview. Please customize
 id: Louisiana Adult Name Change Form
-continue button field: Name_Change_Form_1_1_1_intro
+continue button field: Louisiana_Adult_Name_Change_Form_intro
 question: |
   Louisiana Adult Name Change Form
 subquestion: |
-  Use this tool to complete the forms required to ask a Louisiana court for a name change. It takes about 5 minutes. At the end, you'll be able to review and download your form for submission to the court.
+  Use this tool to complete the forms required to ask a Louisiana court for a name change. It takes about 5 minutes. 
+  
+  At the end, you'll be able to review and download your form for submission to the court.
+  
+  **You should only use this form builder if you are at least 18 years old.**
 ---
 id: Review your form before you sign it
-continue button field: Name_Change_Form_1_1_1_preview_question
+continue button field: Louisiana_Adult_Name_Change_Form_preview_question
 question: |
   Review your form before you sign it
 subquestion: |
@@ -119,21 +182,21 @@ subquestion: |
   
   Click the image to open it in a new tab. Click the 'Make changes' button to fix any mistakes.
   
-  ${ action_button_html(url_action('review_Name_Change_Form_1_1_1'), label='Make changes', color='info') } 
+  ${ action_button_html(url_action('review_Louisiana_Adult_Name_Change_Form'), label='Make changes', color='info') } 
   
   Remember to come back to this window to continue and sign your form.
 ---
 id: About your name change
 question: |
-  About your name change
+  Your new legal name
 fields:
-  - "What would you like your new name to be?": name_new
+  - "What would you like your new legal name to be?": name_new
   - "Describe the reason(s) for your name change request:": name_change_reason
     input type: area
 ---
-id: About you
+id: Final details
 question: |
-  About you
+  Final details
 fields:
   - "What is your birthdate?": petitioner_birthdate
     datatype: date
@@ -160,7 +223,7 @@ sets:
 question: |
   What is your contact information?
 subquestion: |
-  Use an address and phone number where you can be contacted.
+  Use an address and phone number where you can be reached by the court.
 fields:
   - code: |
       users[0].address_fields(default_state="LA")
@@ -191,9 +254,12 @@ code: |
   users[0].address.reset_geocoding()
   users[0].address.geocoding_reset = True
 ---
+code: |
+  signature_fields = ["users[0].signature"]
+---
 progress: 100
 id: download
-event: Name_Change_Form_1_1_1_download
+event: Louisiana_Adult_Name_Change_Form_download
 question: |
   Your form is ready to download.
 subquestion: |
@@ -201,7 +267,7 @@ subquestion: |
   
   View and download your form below. Click the "Make changes" button to fix any mistakes.
 
-  ${ action_button_html(url_action('review_Name_Change_Form_1_1_1'), label='Make changes', color='info') } 
+  ${ action_button_html(url_action('review_Louisiana_Adult_Name_Change_Form'), label='Make changes', color='info') } 
 
   % if ready_to_efile and not (defined('efile') and efile):
   Click the "E-File" button below to e-file your form at ${ trial_court }.
@@ -228,18 +294,18 @@ code: |
   trial_court = court_list.as_court('trial_court', trial_court_index)
 ---
 objects:
-  - Name_Change_Form_1_1_1_attachment: ALDocument.using(title="Louisiana Adult Name Change Form", filename="Name_Change_Form_1_1_1", enabled=True, has_addendum=False)
+  - Louisiana_Adult_Name_Change_Form_attachment: ALDocument.using(title="Louisiana Adult Name Change Form", filename="Louisiana_Adult_Name_Change_Form", enabled=True, has_addendum=False)
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(enabled=True, elements=[Name_Change_Form_1_1_1_attachment], filename="Name_Change_Form_1_1_1.pdf", title="All forms to download for your records")
-  - al_court_bundle: ALDocumentBundle.using(enabled=True, elements=[Name_Change_Form_1_1_1_attachment], filename="Name_Change_Form_1_1_1.pdf", title="All forms to download for your records")
+  - al_user_bundle: ALDocumentBundle.using(enabled=True, elements=[Louisiana_Adult_Name_Change_Form_attachment], filename="Louisiana_Adult_Name_Change_Form.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(enabled=True, elements=[Louisiana_Adult_Name_Change_Form_attachment], filename="Louisiana_Adult_Name_Change_Form.pdf", title="All forms to download for your records")
 ---
 attachment:
-    variable name: Name_Change_Form_1_1_1_attachment[i]
+    variable name: Louisiana_Adult_Name_Change_Form_attachment[i]
     name: Louisiana Adult Name Change Form
     filename: Louisiana-Adult-Name-Change-Form
     skip undefined: True
-    pdf template file: Name_Change_Form_1_1_1.pdf
+    pdf template file: Louisiana_Adult_Name_Change_Form.pdf
     fields: 
       - "petitioner__1": ${ petitioners[0] }
       - "petitioner__2": ${ petitioners[0] }
@@ -269,8 +335,8 @@ attachment:
       # It's a signature: test which file version this is; leave empty unless it's the final version)
       - "user_signature": ${ users[0].signature if i == 'final' else '' }
 ---
-id: Name_Change_Form_1_1_1 review screen
-event: review_Name_Change_Form_1_1_1
+id: Louisiana_Adult_Name_Change_Form review screen
+event: review_Louisiana_Adult_Name_Change_Form
 question: |
   Review Screen
 subquestion: |
@@ -278,37 +344,37 @@ subquestion: |
   **WARNING**: your answers have already been efiled, and changing this will not change your submitted answers.
   % endif
   Edit your answers below
-review: 
-  - Edit: petitioner_birthdate
-    button: |
-      **When is your birthdate?**:
-      ${ petitioner_birthdate }
-  - Edit: social_security_number
-    button: |
-      **What is your social security number?**:
-      ${ social_security_number }
-  - Edit: name_new
-    button: |
-      **What would you like your new name to be?**:
-      ${ name_new }
-  - Edit: name_change_reason
-    button: |
-      **Describe the reason(s) for your name change request:**:
-      ${ name_change_reason }
+review:
   - Edit: petitioners[0].name.first
     button: |
-      **petitioners**
+      **Your current legal name:**
 
       % for my_var in petitioners:
         * ${ my_var }
       % endfor
     # NOTE: a question block with 'petitioners.revisit'
     # lets the user edit all of the items at once
+  - Edit: petitioner_birthdate
+    button: |
+      **Your birthdate:**
+      ${ petitioner_birthdate }
+  - Edit: social_security_number
+    button: |
+      **Your social security number:**
+      ${ social_security_number }
+  - Edit: name_new
+    button: |
+      **Your requested new name:**
+      ${ name_new }
+  - Edit: name_change_reason
+    button: |
+      **The reason(s) for your name change request:**
+      ${ name_change_reason }
   - Edit: petitioners[0].address.address
     button: |
-      **petitioners[0].address.address**:
+      **Your address:**
       ${ petitioners[0].address.on_one_line() }
   - Edit: petitioners[0].phone_number
     button: |
-      **petitioners[0].phone_number**:
+      **Your phone number:**
       ${ petitioners[0].phone_number }
