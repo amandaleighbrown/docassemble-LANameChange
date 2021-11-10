@@ -1,4 +1,4 @@
-#recent updates for commit: upadated template, reordered interview, fixed signature failure, general code cleaning
+#recent updates for commit: convert template to Word
 include:
   - docassemble.AssemblyLine:al_package.yml
   - docassemble.ALLouisianaSC:custom_organization.yml
@@ -191,17 +191,16 @@ question: |
   Your new legal name
 fields:
   - "What would you like your new legal name to be?": name_new
-  - "Describe the reason(s) for your name change request:": name_change_reason
+  - "Describe the reason(s) for your name change request: *(Use complete sentences.)*": name_change_reason
     input type: area
 ---
 id: Final details
 question: |
-  Final details
+  Just a few more details
 fields:
   - "What is your birthdate?": petitioner_birthdate
     datatype: date
   - "What is your social security number?": social_security_number
-  
 ---
 id: your name
 sets:
@@ -221,9 +220,9 @@ sets:
   - users[0].address.county
   - users[0].address.zip
 question: |
-  What is your contact information?
+  How can the court reach you?
 subquestion: |
-  Use an address and phone number where you can be reached by the court.
+  If the court needs to send you any documents, they'll send them to the address you provide here.
 fields:
   - code: |
       users[0].address_fields(default_state="LA")
@@ -297,29 +296,29 @@ objects:
   - Louisiana_Adult_Name_Change_Form_attachment: ALDocument.using(title="Louisiana Adult Name Change Form", filename="Louisiana_Adult_Name_Change_Form", enabled=True, has_addendum=False)
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(enabled=True, elements=[Louisiana_Adult_Name_Change_Form_attachment], filename="Louisiana_Adult_Name_Change_Form.pdf", title="All forms to download for your records")
-  - al_court_bundle: ALDocumentBundle.using(enabled=True, elements=[Louisiana_Adult_Name_Change_Form_attachment], filename="Louisiana_Adult_Name_Change_Form.pdf", title="All forms to download for your records")
+  - al_user_bundle: ALDocumentBundle.using(enabled=True, elements=[Louisiana_Adult_Name_Change_Form_attachment], filename="Louisiana_Adult_Name_Change_Form", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(enabled=True, elements=[Louisiana_Adult_Name_Change_Form_attachment], filename="Louisiana_Adult_Name_Change_Form", title="All forms to download for your records")
 ---
 attachment:
     variable name: Louisiana_Adult_Name_Change_Form_attachment[i]
     name: Louisiana Adult Name Change Form
     filename: Louisiana-Adult-Name-Change-Form
     skip undefined: True
-    pdf template file: Louisiana_Adult_Name_Change_Form.pdf
+    docx template file: Louisiana_Adult_Name_Change_Petition.docx
     fields: 
-      - "petitioner__1": ${ petitioners[0] }
-      - "petitioner__2": ${ petitioners[0] }
-      - "petitioner__3": ${ petitioners[0] }
+      - "petitioner_1": ${ petitioners[0] }
+      - "petitioner_2": ${ petitioners[0] }
+      - "petitioner_3": ${ petitioners[0] }
       - "petitioner_address_on_one_line": ${ petitioners[0].address.on_one_line() }
       - "petitioner_phone_number": ${ petitioners[0].phone_number }
-      - "petitioner__4": ${ petitioners[0] }
-      - "petitioner__5": ${ petitioners[0] }
+      - "petitioner_4": ${ petitioners[0] }
+      - "petitioner_5": ${ petitioners[0] }
       - "petitioner_birthdate": ${ petitioner_birthdate }
       - "social_security_number": ${ social_security_number }
-      - "name_new__1": ${ name_new }
+      - "name_new_1": ${ name_new }
       - "name_change_reason": ${ name_change_reason }
-      - "name_new__2": ${ name_new }
-      - "name_new__3": ${ name_new }
+      - "name_new_2": ${ name_new }
+      - "name_new_3": ${ name_new }
       - "filing_parish1": ${ trial_court.name }
       - "filing_parish2": ${ trial_court.name }
       - "filing_parish3": ${ trial_court.name }
@@ -328,6 +327,7 @@ attachment:
       - "judicial_district2": ${ trial_court.judicial_district }
       - "judicial_district3": ${ trial_court.judicial_district }
       - "district_court1": ${ trial_court.judicial_district }
+      - "district_court2": ${ trial_court.judicial_district }
       - "petitioner_domicile": ${ users[0].address.county.replace(" Parish", "") }
       - "district_attorney1": ${ trial_court.district_attorney }
       - "district_attorney2": ${ trial_court.district_attorney }

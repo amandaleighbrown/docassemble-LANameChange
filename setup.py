@@ -53,7 +53,7 @@ setup(name='docassemble.LANameChange',
       url='https://www.lagniappelawlab.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
-      install_requires=['docassemble.AssemblyLine>=2.6.2', 'docassemble.EFSPIntegration'],
+      install_requires=['docassemble.AssemblyLine>=2.6.2', 'docassemble.EFSPIntegration>=0.2.0'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/LANameChange/', package='docassemble.LANameChange'),
      )
