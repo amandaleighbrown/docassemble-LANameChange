@@ -53,7 +53,7 @@ sections:
 ---
 objects:
   - users: ALPeopleList.using(ask_number=True,target_number=1)
-  - court_list: ALCourtLoader.using(file_name='JDCs_by_Parish.csv')
+  - court_list: ALCourtLoader.using(file_name='JDCs_by_Parish.xlsx')
 ---
 code: |
   lead_contact = users[0]
